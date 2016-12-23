@@ -1,4 +1,4 @@
-# Script to find out the Windows product key of an installation regardless of platform/version.
+' Script to find out the Windows product key of an installation regardless of platform/version.
 
 Set WshShell = CreateObject("WScript.Shell")
 MsgBox ConvertToKey(WshShell.RegRead("HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\DigitalProductId"))

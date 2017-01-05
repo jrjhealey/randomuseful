@@ -5,9 +5,10 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+# Create a custom command prompt, looks like so: joehealey@Joes-MBP: ~ $
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+# Large history. Ignore common unimportant commands.
 HISTFILESIZE=4000000000
 HISTSIZE=10000
 export HISTIGNORE="ls:cd:top:l:la:ll:"
@@ -15,17 +16,9 @@ export HISTIGNORE="ls:cd:top:l:la:ll:"
 # append to the history file, don't overwrite it
 shopt -s histappend
 
-# Make regular (daily) backups of the history:
-#export HISTFILE=~/.history/`date +%Y%m%d`.hist
-#export HISTSIZE=100000
-
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
-
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -67,9 +60,7 @@ unset color_prompt force_color_prompt
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls -h --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
+    
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
@@ -88,11 +79,7 @@ alias open='xdg-open'
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
+# Alias definitions. If a separate aliases file exists, source it:
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
@@ -144,10 +131,6 @@ mvg (){
   fi
 }
 
-#Copy and paste contents of file to a clipboard from command line
-#alias pbcopy=`xsel --clipboard --input`
-#alias pbpaste=`xsel --clipboard --output`
-
 
 # Directory navigation aliases
 alias 2up='cd ../..'
@@ -160,6 +143,7 @@ past (){
    echo "Searching the history for "$1"."
     history | grep $1
 }
+
 # Folder size
 dush (){
    echo "The size of "$1" is:"
@@ -169,32 +153,14 @@ dush (){
 
 # More aliases:
 
-alias process='ps -u wms_joe'
+# Handy little alias to print purely numeric dates. Can be called to make output files:
+# e.g: cat *.logs > log_backup_$(today).txt     which would create: log_backup_01012000.txt
 alias today='(date +'%d%m%Y')'
-
-# Aliases for hhblits environment (wont be needed once centrally installed)
-
-export HHLIB=/home/wms_joe/Applications/HHSuite/lib/hh
-PATH=$PATH:/home/wms_joe/Applications/HHSuite/bin/:$HHLIB/scripts
-alias hhblits='/home/wms_joe/Applications/HHSuite/bin/hhblits -d /home/wms_joe/Applications/HHSuite/databases/pdb70/pdb70'
-
-# Add chimera directory for pychimera to access
-export CHIMERADIR='/home/wms_joe/Applications/CHIMERAHL1.11/'
-
-PATH=$PATH:/home/wms_joe/Programs/
-
-export iterm2_hostname=DMI
-test -e "${HOME}/.iterm2_shell_integration.tcsh" && source "${HOME}/.iterm2_shell_integration.tcsh"
 
 export PYTHONSTARTUP=~/.pythonrc
 
-# added by Miniconda2 4.1.11 installer
-export PATH="/home/wms_joe/bin/miniconda2/bin:$PATH"
-export PATH=$PATH:/home/wms_joe/bin/atom-1.10.2-amd64/
-export PATH=$PATH:/home/wms_joe/bin/bioinfo-tools/
-export PATH=$PATH:/home/wms_joe/bin/bioinfx/
-
 # Function to return the local machine IP for scp etc.
+# use like: scp somefile_on_server user@$(client):~/
 client (){
 echo $SSH_CLIENT | awk '{ print $1}'
 }

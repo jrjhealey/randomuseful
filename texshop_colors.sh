@@ -5,6 +5,7 @@
 # Light background, red text
 
 solarized2(){
+  echo "Setting solarized2 theme."
 defaults write TeXShop background_R 0.1315524628925428
 defaults write TeXShop background_G 0.1514611456578815
 defaults write TeXShop background_B 0.1584508659361748
@@ -209,6 +210,7 @@ THEMES:
  - "pale"                   Pale tan background, grey/red text.
  - "solarzied_light"        High contrast, light background.
  - "solarized_dark"         High contrast, dark background.
+ - "solarzed2"		    An alternative solarized theme.
  - "default"                Reset to TexShop default colour theme.
 EOF
 }

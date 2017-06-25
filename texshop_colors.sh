@@ -2,6 +2,39 @@
 # Script to change texshop colours.
 
 #Themes:
+# Green on black, matrix style. (Just for fun, not actually very useful!)
+matrix(){
+echo "So you took the red pill?.."
+defaults write TeXShop background_R 0
+defaults write TeXShop background_G 0
+defaults write TeXShop background_B 0
+
+defaults write TeXShop foreground_R 0
+defaults write TeXShop foreground_G 1
+defaults write TeXShop foreground_B 0
+
+defaults write TeXShop commentred 0
+defaults write TeXShop commentgreen 0.9
+defaults write TeXShop commentblue 0
+
+defaults write TeXShop commandred 0
+defaults write TeXShop commandgreen .8
+defaults write TeXShop commandblue 0
+
+defaults write TeXShop indexred 0
+defaults write TeXShop indexgreen 0.7
+defaults write TeXShop indexblue 0
+
+defaults write TeXShop markerred 0.0
+defaults write TeXShop markergreen 0.6
+defaults write TeXShop markerblue 0
+
+defaults write TeXShop insertionpoint_R 0
+defaults write TeXShop insertionpoint_G 0.5
+defaults write TeXShop insertionpoint_B 0
+
+}
+
 # Light background, red text
 
 solarized2(){
@@ -204,14 +237,15 @@ so that they are read before they are called.
 
 OPTIONS:
    -h | --help     	Show this message
-   -t | --theme     Specify which theme to apply. Choose from:
+   -t | --theme     	Specify which theme to apply. Choose from:
    
 THEMES:
- - "pale"                   Pale tan background, grey/red text.
- - "solarzied_light"        High contrast, light background.
- - "solarized_dark"         High contrast, dark background.
- - "solarzed2"		    An alternative solarized theme.
- - "default"                Reset to TexShop default colour theme.
+ - "pale"               Pale tan background, grey/red text.
+ - "solarzied_light"    High contrast, light background.
+ - "solarized_dark"     High contrast, dark background.
+ - "solarzed2"		An alternative dark solarized theme.
+ - "default"            Reset to TexShop default colour theme.
+ - "matrix"		Fun green and black style. Not actually that functional!
 EOF
 }
 
@@ -248,5 +282,7 @@ if [[ -z $theme ]]; then
 	usage
 fi
 
-
+# Call the function
 "$theme"
+
+echo "Ensure TeXShop is restarted for the changes to take effect."

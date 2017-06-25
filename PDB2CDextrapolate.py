@@ -22,6 +22,8 @@ import traceback
 import sys
 
 __author__ = "Joe R. J. Healey"
+# Contributions to Taylor series calculation from Lewis Baker
+
 __version__ = "1.0.0"
 __title__ = "PDB2CDextraploate"
 __license__ = "GPLv3"
@@ -66,6 +68,12 @@ def parseArgs():
                             '--plot',
                             action='store_true',
                             help='Output a plot to examine the new spectrum (requires Matplotlib installed).')
+        parser.add_argument('-d',
+                            '--delta',
+                            action='store',
+                            type=int,
+                            default=3,
+                            help='The step distance to calculate the gradient over. [Default & minimum = 3]')
 
     except:
         print "An exception occurred with argument parsing. Check your provided options."
@@ -95,8 +103,15 @@ def getSpectraValues(spectrum):
         Xvals = []
         Yvals = []
         # Skip exta info at top of file
-        header = ifh.readline()[0:10]
-        noheader = ifh.readlines()[11:]
+        header = []
+        noheader = []
+
+        for linenumber, line in enumerate(ifh):
+            if linenumber < 12:
+                header.append(line)
+            elif linenumber > 12:
+                noheader.append(line)
+
         for line in noheader:
             # Ensure we're dealing with spectral data with wavelength in column 1
             if re.match(r"^\d\d\d", line):
@@ -109,32 +124,68 @@ def getSpectraValues(spectrum):
 
     return Xvals, Yvals, header
 
+def arrayAvg(array):
+    return sum(array)/float(len(array))
 
-def forecastSpectra(Xvals,Yvals, forecast):
+def arrayDiff(array):
+    return [b - a for a, b in zip(array[:-1], array[1:])]
+
+
+def forecastSpectra(Xvals,Yvals, forecast, delta):
     """Compute the gradient (average difference) of the last 5 values of each X and Y array"""
+    import math
 
     for a in range(forecast):
-        X5 = Xvals[-5:]
-        print(X5)
-        Y5 = Yvals[-5:]
-        print(Y5)
-        xDiffs = [j-i for i, j in zip(X5[:-1], X5[1:])]
-        yDiffs = [l-k for k, l in zip(Y5[:-1], Y5[1:])]
+        Xsub = Xvals[-delta:]
+        Ysub = Yvals[-delta:]
+        # Compute first x and y differences as arrays
+        x1diffs = arrayDiff(Xsub)
+        y1diffs = arrayDiff(Ysub)
 
+        # Average first order difference
+        d1y = arrayAvg(arrayDiff(Ysub))/arrayAvg(arrayDiff(Xsub))
 
-        xAvg = sum(xDiffs)/float(len(xDiffs))
-        yAvg = round(sum(yDiffs)/float(len(yDiffs)), 3)
+        # Make array of adjacent gradients
+        diffarray1 = []
+        for x, y in zip(x1diffs, y1diffs):
+            diffarray1.append(y/x)
 
-    # Extend X and Y values by their average differences
-        Xvals.append(Xvals[-1] + xAvg)
-        Yvals.append(Yvals[-1] + yAvg)
+        # Get differences in adjacent gradients.
+        diffarray2 = [n - m for m, n in zip(diffarray1[:-1], diffarray1[1:])]
 
+        # Average second order difference
+        d2avg = arrayAvg(diffarray2)
+
+        x1avg = arrayAvg(arrayDiff(Xsub))
+        d2y = d2avg/x1avg
+
+        # Third order terms
+        diffarray3 = [p - o for o, p in zip(diffarray1[:-1], diffarray1[1:])]
+        d3avg = arrayAvg(diffarray3)
+
+        d3y = d3avg/x1avg
+
+        # Simple to extend in the case of x as this is just linear
+        Xvals.append(Xvals[-1] + x1avg)
+
+        # For y, a finite difference partial Taylor expansion approximates the curve
+        # Maximum number of terms = number of points fitted..
+
+        Yvals.append(Yvals[-1] +
+                     Yvals[-1] * d1y +
+                     (((Yvals[-1]**2) * d2y) * (1/math.factorial(2))) +
+                     (((Yvals[-1]**3) * d3y) * (1/math.factorial(3)))
+                     )
+
+    # y (first term
+    # y x First derivative (second term)
+    # 0.5*y^2 x Second derivative (third term)
     return Xvals, Yvals
 
 
 def plot(Xvals, Yvals):
     import matplotlib.pyplot as plt
-    plt.plot(Xvals,Yvals)
+    plt.plot(Xvals, Yvals)
     plt.show()
 
 
@@ -150,7 +201,7 @@ def main():
     outfile = args.outfile
     verbose = args.verbose
     makeplot = args.plot
-
+    delta = args.delta
 
     if args.bibliography is True:
         displayRefs()
@@ -165,7 +216,7 @@ def main():
     Xvals, Yvals, header = getSpectraValues(spectrum)
 
     # Project new data to output
-    Xvals, Yvals = forecastSpectra(Xvals, Yvals, forecast)
+    Xvals, Yvals = forecastSpectra(Xvals, Yvals, forecast, delta)
 
     if outfile is not 'None':
         with open(outfile, 'w') as ofh:
@@ -174,7 +225,7 @@ def main():
                 ofh.write(str(c1) + '\t' + str(c2))
     else:
         for line in header:
-            print(line)
+            print(line.rstrip("\n"))
         for c1, c2 in zip(Xvals, Yvals):
             print(str(c1) + '\t' + str(c2))
 

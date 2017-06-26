@@ -248,10 +248,9 @@ OPTIONS:
    -h | --help     	Show this message
    -t | --theme     	Specify which theme to apply. Choose from:
    -c | --calculate	Convert an RGB value to a 0-1 scale (e.g.
-			Hex FF9900 (orange), is RGB(255,153,0) which
-			is 1,0.6,0.)
-			Provide this as "R:G:B", Results are returned the same.
-
+			Hex FF9900 (orange), is RGB(255,153,0)
+ 			equivalent to 1:0.6:0.)
+			Provide a string 'R:G:B' for conversion.
 
 THEMES:
  - "pale"               Pale tan background, grey/red text.

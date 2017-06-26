@@ -1,6 +1,17 @@
 #!/bin/bash
 # Script to change texshop colours.
 
+calc(){
+IFS=: read -r R G B <<< "$1"
+ r=$(bc -l <<< "$R/255")
+ b=$(bc -l <<< "$G/255")
+ g=$(bc -l <<< "$B/255")
+
+echo "R $R converts to: $r"
+echo "G $G converts to: $g"
+echo "B $B converts to: $b"
+}
+
 #Themes:
 # Green on black, matrix style. (Just for fun, not actually very useful!)
 matrix(){
@@ -218,8 +229,6 @@ defaults write TeXShop markerblue 0.13
 }
 
 
-
-
 usage()
 {
 cat << EOF
@@ -228,7 +237,7 @@ usage: $0 -t|--theme <theme_name>
 This script alters texshop source editor colours. By explicitly
 specifying RGB values, you have almost limitless customisation.
 
-TexShop will need to be restarted between theme changes for them 
+TexShop will need to be restarted between theme changes for them
 to take effect.
 
 New themes can be added manually and the RGB values tweaked.
@@ -238,7 +247,12 @@ so that they are read before they are called.
 OPTIONS:
    -h | --help     	Show this message
    -t | --theme     	Specify which theme to apply. Choose from:
-   
+   -c | --calculate	Convert an RGB value to a 0-1 scale (e.g.
+			Hex FF9900 (orange), is RGB(255,153,0) which
+			is 1,0.6,0.)
+			Provide this as "R:G:B", Results are returned the same.
+
+
 THEMES:
  - "pale"               Pale tan background, grey/red text.
  - "solarzied_light"    High contrast, light background.
@@ -252,21 +266,28 @@ EOF
 for arg in "$@"; do
   shift
   case "$arg" in
-                  "--help")
-                  set -- "$@" "-h"
-                  ;;
-                  "--theme")
-                  set -- "$@" "-t"
-                  ;;
-                  *)
-                  set -- "$@" "$arg"
+                "--help")
+                set -- "$@" "-h"
+                ;;
+                "--theme")
+                set -- "$@" "-t"
+                ;;
+		"--calculate")
+		set -- "$@" "-c"
+		;;
+                *)
+                set -- "$@" "$arg"
   esac
 done
+
 # getopts assigns the arguments to variables
-while getopts "ht:" OPTION ;do
+while getopts "ht:c:" OPTION ;do
   case $OPTION in
     t)
     theme=$OPTARG
+    ;;
+    c)
+    vals=$OPTARG
     ;;
     h)
     usage
@@ -275,14 +296,16 @@ while getopts "ht:" OPTION ;do
   esac
 done
 
-if [[ -z $theme ]]; then
+if [[ ! -z "$theme" ]] ; then
+  "$theme"
+  echo "Ensure TeXShop is restarted for the changes to take effect."
 
-      echo "No theme identifier provided. Exiting." ; exit 1
-      echo "======================================"
-	usage
+  elif [[ ! -z "$vals" ]] ; then
+   calc "$vals"
+
+else
+  echo "No theme/options provided. Exiting." ; exit 1
+  echo "==================================="
+  usage
+
 fi
-
-# Call the function
-"$theme"
-
-echo "Ensure TeXShop is restarted for the changes to take effect."

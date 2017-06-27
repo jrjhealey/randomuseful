@@ -32,5 +32,5 @@ This works like so:
 and will produce the following output:
 
     R 255 converts to: 1.00000000000000000000
-    G 153 converts to: 0
-    B 0 converts to: .60000000000000000000
+    G 153 converts to: .60000000000000000000
+    B 0 converts to: 0

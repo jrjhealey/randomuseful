@@ -160,9 +160,9 @@ solarized_dark(){
 # solarized dark color scheme
 
 # background = solarized base03 = 0  43  54
-defaults write TeXShop background_R 0.169
-defaults write TeXShop background_G 0.169
-defaults write TeXShop background_B 0.169
+defaults write TeXShop background_R 0.269
+defaults write TeXShop background_G 0.269
+defaults write TeXShop background_B 0.269
 
 # commands = solarized red = 220  50  47
 defaults write TeXShop commandred 0.86
@@ -233,6 +233,7 @@ usage()
 {
 cat << EOF
 usage: $0 -t|--theme <theme_name>
+       $0 -c|--calculate R:G:B
 
 This script alters texshop source editor colours. By explicitly
 specifying RGB values, you have almost limitless customisation.
@@ -246,11 +247,11 @@ so that they are read before they are called.
 
 OPTIONS:
    -h | --help     	Show this message
-   -t | --theme     	Specify which theme to apply. Choose from:
    -c | --calculate	Convert an RGB value to a 0-1 scale (e.g.
-			Hex FF9900 (orange), is RGB(255,153,0)
- 			equivalent to 1:0.6:0.)
-			Provide a string 'R:G:B' for conversion.
+			Hex FF9900 (orange) = RGB(255,153,0) = 1:0.6:0)
+			Provide a colon delimited string as in 
+			'R:G:B' for conversion.
+   -t | --theme         Specify which theme to apply. Choose from:
 
 THEMES:
  - "pale"               Pale tan background, grey/red text.
@@ -303,8 +304,8 @@ if [[ ! -z "$theme" ]] ; then
    calc "$vals"
 
 else
-  echo "No theme/options provided. Exiting." ; exit 1
+  echo "No theme/options provided. Exiting."
   echo "==================================="
   usage
-
+  exit 1
 fi

@@ -1,0 +1,82 @@
+ruby -e "# encoding: UTF-8
+
+sdy= <<'TEXT'
+1 01 2013 New Year's Day.
+'s Day 25 02 2013
+Chakri Day 6 04 2013
+8 04 2013 Substitute Chakri.
+13 04 2013 Day
+14 04 2013 Day
+15 04 2013 Day
+16 04 2013 Substitution for Songkran.
+1 05 2013 Labor Day
+5 05 2013 Coronation Day
+6 05 2013 Substitution for Coronation Day.
+13 05 2013 The Ploughing
+24 05 2013 Day of Vesak
+1 07, 2013 Mid Year (Bank).
+22 07 2013 Asalhapuja
+23 07 2013 Day of Lent
+12 08 2013 Mother's Day.
+23 10 2013 Tuesday
+5 12 2013 Father's Day.
+10 12 2013 Constitution Day
+31 12 2013 end of year        
+TEXT
+time = Time.new
+asdy = sdy.split(\"\n\")
+xdy = {}
+n = 0
+while n < asdy.count
+xa,xb = asdy[n].split(\"\t\t\")
+xas = xa.split(\"\t\")
+if time.month == xas[1].to_i
+xdy[xas[0].to_i] = xb
+end
+#Time.mktime(xas[2].to_s,xas[1].to_s,xas[0].to_s)
+n += 1
+end
+
+cal = %x(cal)
+
+time = Time.new
+
+cal = cal.sub(time.strftime(\"%B\"),'')
+cal = cal.sub('Su Mo Tu We Th Fr Sa','')
+cal = cal.sub(time.strftime(\"%Y\"),'')
+#cal = cal.sub(time.day.to_s,\"(#{time.day.to_s})\")
+cal = cal.sub(\"\n\",'')
+cal = cal.sub(\"\r\",'')
+cal = cal.sub(\"\t\",'')
+cala = cal.split(' ')
+
+
+
+lwdy = {
+\"0\" => \"Su\t\" ,
+\"1\" => \"Mo\t\" ,
+\"2\" => \"Tu\t\" ,
+\"3\" => \"We\t\" ,
+\"4\" => \"Th\t\" ,
+\"5\" => \"Fr\t\" ,
+\"6\" => \"Sa\t\" 
+} 
+
+
+
+#c = []
+n = 0
+
+while n < cala.count do
+t = Time.mktime(time.year,time.month,cala[n]) 
+if cala[n] == time.day.to_s 
+    td = 'TODAY'
+else 
+     td = cala[n]
+end
+puts \"#{lwdy[t.wday.to_s]}\t#{td}\t#{xdy[cala[n].to_i]}\"
+n += 1
+end"
+
+
+

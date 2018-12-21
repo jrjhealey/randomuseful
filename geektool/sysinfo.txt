@@ -1,0 +1,22 @@
+echo "Workstation:\t\t"`scutil --get ComputerName`;
+echo "CPU:\t\t\t"`sysctl -n machdep.cpu.brand_string`;
+echo "Total memory:\t"`sysctl -n hw.memsize | awk '{print $0/1073741824" GB of RAM"}'`;
+export memTotal=`sysctl -n hw.memsize | awk '{print $0/1048576}'`;
+export memUsed=`(top -l 1 | awk '/PhysMem/' | awk '{print $2}';) | cut -d 'M' -f 1  | cut -d 'G' -f 1`;
+export memFree=`echo $memTotal - $memUsed | bc`;
+export memShortFree=`echo "scale=2;$memFree / 1024" | bc -l`;
+export memShortUsed=`echo "scale=2;$memUsed / 1024" | bc -l`;
+
+echo "Free memory:\t$memShortFree GB of RAM" "- "$(( 100* $memFree / $memTotal ))" %";
+echo "Used memory:\t$memShortUsed GB of RAM" "- "$(( 100* $memUsed / $memTotal ))" %";
+
+echo "Wireless IP:\t\t"`ifconfig | grep "inet" | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}'`;
+uptime | awk '{sub(/[0-9]|user,|users,|load/, "", $6);
+sub(/mins,|min,/, "min", $6);
+sub(/user,|users,/, "", $5); sub(",", "min", $5);
+sub(":", "h ", $5); sub(/[0-9]/, "", $4);
+sub(/day,/, " day ", $4); sub(/days,/, " days ", $4);
+sub(/mins,|min,/, "min", $4); sub("hrs,", "h", $4);
+sub(":", "h ", $3);
+sub(",", "min", $3);
+print "System Uptime:\t"$3$4$5$6}'
